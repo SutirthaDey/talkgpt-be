@@ -25,7 +25,6 @@ const NODE_ENV = process.env.NODE_ENV ?? 'production';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        console.log(configService.get('database.autoLoadEntities'));
         return {
           type: 'postgres',
           host: configService.get('database.host'),

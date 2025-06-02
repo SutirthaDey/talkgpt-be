@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -11,7 +11,7 @@ import { JwtModule } from '@nestjs/jwt';
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
-    AuthModule,
+    forwardRef(() => AuthModule),
     /* Registers the custom jwt config so it can be accessed via ConfigService.get('jwt'). **/
     ConfigModule.forFeature(jwtConfig),
     /* Configures the JwtModule dynamically using values from the registered jwt config. **/

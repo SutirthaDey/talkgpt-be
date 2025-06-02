@@ -45,8 +45,7 @@ export class UsersService {
       });
 
       newUser = await this.userRepository.save(newUser);
-    } catch (error) {
-      console.log(error);
+    } catch {
       throw new RequestTimeoutException('Failed to create user');
     }
 
