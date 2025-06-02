@@ -8,6 +8,10 @@ import { AuthModule } from './auth/auth.module';
 import environmentValidation from './config/environment.validation';
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
+import { APP_GUARD } from '@nestjs/core';
+import { AccessTokenGuardGuard } from './auth/guards/access-token/access-token.guard.guard';
+import jwtConfig from './auth/config/jwt.config';
+import { JwtModule } from '@nestjs/jwt';
 
 const NODE_ENV = process.env.NODE_ENV ?? 'production';
 
@@ -15,6 +19,10 @@ const NODE_ENV = process.env.NODE_ENV ?? 'production';
   imports: [
     AuthModule,
     UsersModule,
+    /* Registers the custom jwt config so it can be accessed via ConfigService.get('jwt'). **/
+    ConfigModule.forFeature(jwtConfig),
+    /* Configures the JwtModule dynamically using values from the registered jwt config. **/
+    JwtModule.registerAsync(jwtConfig.asProvider()),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: NODE_ENV == 'production' ? '.env' : `.env.${NODE_ENV}`,
@@ -40,6 +48,12 @@ const NODE_ENV = process.env.NODE_ENV ?? 'production';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AccessTokenGuardGuard,
+    },
+  ],
 })
 export class AppModule {}
