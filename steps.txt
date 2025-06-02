@@ -8,4 +8,34 @@
    npm run start:dev methode to NODE_ENV=development
 
 
-8. after this we have configure authentication and authorization.
+8. After this we have configure authentication and authorization.
+
+If we need to create jwt configuration in auth module and want to use it in other modules if needed.
+
+  imports: [
+    /* Registers the custom jwt config so it can be accessed via ConfigService.get('jwt'). **/
+    ConfigModule.forFeature(jwtConfig),
+    /* Configures the JwtModule dynamically using values from the registered jwt config. **/
+    JwtModule.registerAsync(jwtConfig.asProvider()),
+  ],
+
+  In the auth module, it will do the same.
+
+  And Export the JwtModule in exports array.
+
+  Now whereever you want to use jwt service and configuration use this in imports
+
+  imports: [
+    /* Registers the custom jwt config so it can be accessed via ConfigService.get('jwt'). **/
+    ConfigModule.forFeature(jwtConfig),
+    /* Configures the JwtModule dynamically using values from the registered jwt config. **/
+    JwtModule.registerAsync(jwtConfig.asProvider()),
+  ],
+
+And in the service file, you can use the jwt service like this
+
+  constructor(
+    private readonly jwtService: JwtService, // This is for jwt services like sign, verify
+    @Inject(jwtConfig.KEY)
+    private readonly jwtConfiguration: ConfigType<typeof jwtConfig>, // This is for getting jwt values from env configurations
+  ) {}
