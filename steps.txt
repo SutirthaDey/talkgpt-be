@@ -1,0 +1,11 @@
+1. create database connection
+2. configure the config module using configModule
+3. [install typeorm @nestjs/typeorm pg]
+4. add validations of env variables using joi. [install joi]
+5. Now I will create namespace config for appConfig, database config.
+6. create an endpoint and use pipes. [install class-validator and class-transformer]
+7. for new project, while configuring the env files for development, also change the 
+   npm run start:dev methode to NODE_ENV=development
+
+
+8. after this we have configure authentication and authorization.
