@@ -8,6 +8,8 @@ import { UsersService } from 'src/users/users.service';
 import { SignInDto } from './dtos/sign-in.dto';
 import { HashingProvider } from './provider/hashing.provider';
 import { GenerateTokenProvider } from './provider/generate-token.provider';
+import { GoogleTokenDto } from './dtos/google-token.dto';
+import { GoogleAuthenticationProvider } from './provider/google-authentication.provider';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +18,7 @@ export class AuthService {
     private readonly userService: UsersService,
     private readonly hashingProvider: HashingProvider,
     private readonly generateTokenProvider: GenerateTokenProvider,
+    private readonly googleAuthenticationProvider: GoogleAuthenticationProvider,
   ) {}
 
   async signIn(signInDto: SignInDto) {
@@ -46,5 +49,9 @@ export class AuthService {
 
   async signUp(signUpDto: SignInDto) {
     return await this.userService.createUser(signUpDto);
+  }
+
+  async authenticateViaGoogle(googleTokenDto: GoogleTokenDto) {
+    return await this.googleAuthenticationProvider.authenticate(googleTokenDto);
   }
 }

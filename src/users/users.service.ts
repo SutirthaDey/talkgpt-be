@@ -12,6 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import jwtConfig from 'src/auth/config/jwt.config';
 import { ConfigType } from '@nestjs/config';
 import { SignUpDto } from 'src/auth/dtos/sign-up.dto';
+import { GoogleUser } from 'src/auth/interface/google-user.interface';
 
 @Injectable()
 export class UsersService {
@@ -70,5 +71,35 @@ export class UsersService {
     } catch {
       throw new RequestTimeoutException('Could not execute the query.');
     }
+  }
+
+  async getUserByGoogleId(googleId: string) {
+    try {
+      const user = await this.userRepository.findOneBy({ googleId });
+
+      return user;
+    } catch {
+      throw new RequestTimeoutException('Could not execute the query.');
+    }
+  }
+
+  async createGoogleUser(googleUser: GoogleUser) {
+    let user = await this.getUserByGoogleId(googleUser.googleId);
+
+    if (user) {
+      throw new ConflictException('Google User already Exists!');
+    }
+
+    user = await this.getUserByEmail(googleUser.email);
+
+    if (user) {
+      throw new ConflictException('Email Id already Exists!');
+    }
+
+    let newUser = this.userRepository.create(googleUser);
+
+    newUser = await this.userRepository.save(newUser);
+
+    return newUser;
   }
 }
