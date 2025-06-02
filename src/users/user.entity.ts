@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Profile } from 'src/profile/profile.entity';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class User {
@@ -30,4 +31,11 @@ export class User {
     nullable: true,
   })
   googleId?: string;
+
+  @OneToOne(() => Profile, (profile) => profile.user, {
+    cascade: true,
+    eager: true,
+  })
+  @JoinColumn()
+  profile: Profile;
 }

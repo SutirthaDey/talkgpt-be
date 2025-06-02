@@ -39,10 +39,7 @@ export class AuthService {
       );
     }
 
-    const tokens = await this.generateTokenProvider.generateTokens({
-      id: user.id,
-      email: user.email,
-    });
+    const tokens = await this.generateTokenProvider.generateTokens(user);
 
     return tokens;
   }

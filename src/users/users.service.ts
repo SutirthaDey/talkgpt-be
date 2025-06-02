@@ -13,6 +13,7 @@ import jwtConfig from 'src/auth/config/jwt.config';
 import { ConfigType } from '@nestjs/config';
 import { SignUpDto } from 'src/auth/dtos/sign-up.dto';
 import { GoogleUser } from 'src/auth/interface/google-user.interface';
+import { ProfileService } from 'src/profile/profile.service';
 
 @Injectable()
 export class UsersService {
@@ -23,6 +24,7 @@ export class UsersService {
     private readonly jwtService: JwtService,
     @Inject(jwtConfig.KEY)
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
+    private readonly profileService: ProfileService,
   ) {}
 
   async getUsers(): Promise<User[]> {
@@ -40,9 +42,11 @@ export class UsersService {
     }
 
     try {
+      const profile = await this.profileService.createProfile({});
       newUser = this.userRepository.create({
         ...signUpDto,
         password: await this.hashingProvider.hashPassword(password),
+        profile: profile,
       });
 
       newUser = await this.userRepository.save(newUser);
@@ -96,7 +100,16 @@ export class UsersService {
       throw new ConflictException('Email Id already Exists!');
     }
 
-    let newUser = this.userRepository.create(googleUser);
+    const profile = await this.profileService.createProfile({
+      firstName: googleUser.firstName,
+      lastName: googleUser.lastName,
+      profilePic: googleUser.profilePic,
+    });
+
+    let newUser = this.userRepository.create({
+      ...googleUser,
+      profile: profile,
+    });
 
     newUser = await this.userRepository.save(newUser);
 

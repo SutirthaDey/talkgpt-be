@@ -13,6 +13,7 @@ import { AccessTokenGuardGuard } from './auth/guards/access-token/access-token.g
 import jwtConfig from './auth/config/jwt.config';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthorizationGuard } from './auth/guards/authorization.guard';
+import { ProfileModule } from './profile/profile.module';
 
 const NODE_ENV = process.env.NODE_ENV ?? 'production';
 
@@ -47,6 +48,7 @@ const NODE_ENV = process.env.NODE_ENV ?? 'production';
         };
       },
     }),
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [

@@ -7,6 +7,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import jwtConfig from 'src/auth/config/jwt.config';
 import { JwtModule } from '@nestjs/jwt';
+import { ProfileModule } from 'src/profile/profile.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { JwtModule } from '@nestjs/jwt';
     ConfigModule.forFeature(jwtConfig),
     /* Configures the JwtModule dynamically using values from the registered jwt config. **/
     JwtModule.registerAsync(jwtConfig.asProvider()),
+    ProfileModule,
   ],
   providers: [UsersService],
   controllers: [UsersController],
