@@ -7,11 +7,11 @@ import {
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateUserDto } from './dtos/create-user.dto';
 import { HashingProvider } from 'src/auth/provider/hashing.provider';
 import { JwtService } from '@nestjs/jwt';
 import jwtConfig from 'src/auth/config/jwt.config';
 import { ConfigType } from '@nestjs/config';
+import { SignUpDto } from 'src/auth/dtos/sign-up.dto';
 
 @Injectable()
 export class UsersService {
@@ -28,19 +28,19 @@ export class UsersService {
     return await this.userRepository.find();
   }
 
-  async createUser(createUserDto: CreateUserDto) {
-    const { email, password } = createUserDto;
+  async createUser(signUpDto: SignUpDto) {
+    const { email, password } = signUpDto;
 
     const user = await this.getUserByEmail(email);
     let newUser;
 
     if (user) {
-      throw new ConflictException('Email already exists');
+      throw new ConflictException('Email already exists.');
     }
 
     try {
       newUser = this.userRepository.create({
-        ...createUserDto,
+        ...signUpDto,
         password: await this.hashingProvider.hashPassword(password),
       });
 

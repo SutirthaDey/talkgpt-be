@@ -43,4 +43,8 @@ export class AuthService {
 
     return tokens;
   }
+
+  async signUp(signUpDto: SignInDto) {
+    return await this.userService.createUser(signUpDto);
+  }
 }
