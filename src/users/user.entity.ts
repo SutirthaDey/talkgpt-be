@@ -1,5 +1,13 @@
+import { ChatHistory } from 'src/chat-history/entities/chat-history.entity';
 import { Profile } from 'src/profile/profile.entity';
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryColumn,
+} from 'typeorm';
 
 @Entity()
 export class User {
@@ -38,4 +46,7 @@ export class User {
   })
   @JoinColumn()
   profile: Profile;
+
+  @OneToMany(() => ChatHistory, (chatHistory) => chatHistory.user)
+  chatHistories: ChatHistory[];
 }

@@ -1,0 +1,52 @@
+import { Injectable } from '@nestjs/common';
+import { ChatHistory } from './entities/chat-history.entity';
+import { ChatMessage } from './entities/chat-message.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ActiveUserData } from 'src/auth/interface/active-user.interface';
+import { SendMessageDto } from './dtos/send-message.dto';
+
+@Injectable()
+export class ChatHistoryService {
+  constructor(
+    @InjectRepository(ChatHistory)
+    private historyRepo: Repository<ChatHistory>,
+
+    @InjectRepository(ChatMessage)
+    private messageRepo: Repository<ChatMessage>,
+  ) {}
+
+  async createSession(user: ActiveUserData): Promise<ChatHistory> {
+    const session = this.historyRepo.create({ user });
+    return await this.historyRepo.save(session);
+  }
+
+  async addMessage(
+    sessionId: string,
+    sendMessageDto: SendMessageDto,
+  ): Promise<ChatMessage> {
+    const chatHistory = await this.historyRepo.findOne({
+      where: { id: sessionId },
+    });
+    const newMessage = this.messageRepo.create({
+      ...sendMessageDto,
+      chatHistory,
+    });
+    return await this.messageRepo.save(newMessage);
+  }
+
+  async getHistory(sessionId: string): Promise<ChatMessage[]> {
+    return this.messageRepo.find({
+      where: { chatHistory: { id: sessionId } },
+      order: { createdAt: 'ASC' },
+    });
+  }
+
+  async getUserSessions(user: ActiveUserData): Promise<ChatHistory[]> {
+    return this.historyRepo.find({
+      where: { user },
+      order: { createdAt: 'DESC' },
+      relations: ['messages'],
+    });
+  }
+}

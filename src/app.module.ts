@@ -14,6 +14,7 @@ import jwtConfig from './auth/config/jwt.config';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthorizationGuard } from './auth/guards/authorization.guard';
 import { ProfileModule } from './profile/profile.module';
+import { ChatHistoryModule } from './chat-history/chat-history.module';
 
 const NODE_ENV = process.env.NODE_ENV ?? 'production';
 
@@ -49,6 +50,7 @@ const NODE_ENV = process.env.NODE_ENV ?? 'production';
       },
     }),
     ProfileModule,
+    ChatHistoryModule,
   ],
   controllers: [AppController],
   providers: [
