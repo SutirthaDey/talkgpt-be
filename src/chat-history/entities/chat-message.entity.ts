@@ -24,7 +24,7 @@ export class ChatMessage {
     type: 'text',
     nullable: false,
   })
-  messsage: string;
+  message: string;
 
   @ManyToOne(() => ChatHistory, (chatHistory) => chatHistory.messages, {
     onDelete: 'CASCADE',

@@ -28,11 +28,16 @@ export class ChatHistoryService {
     const chatHistory = await this.historyRepo.findOne({
       where: { id: sessionId },
     });
-    const newMessage = this.messageRepo.create({
+
+    let newMessage = this.messageRepo.create({
       ...sendMessageDto,
       chatHistory,
     });
-    return await this.messageRepo.save(newMessage);
+
+    newMessage = await this.messageRepo.save(newMessage);
+    console.log(newMessage);
+
+    return newMessage;
   }
 
   async getHistory(sessionId: string): Promise<ChatMessage[]> {

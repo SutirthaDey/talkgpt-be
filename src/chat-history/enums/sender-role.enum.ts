@@ -1,4 +1,4 @@
 export enum SenderRoleEnum {
-  System,
-  User,
+  System = 'system',
+  User = 'user',
 }
