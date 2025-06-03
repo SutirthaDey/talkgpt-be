@@ -8,13 +8,14 @@ import { AuthModule } from './auth/auth.module';
 import environmentValidation from './config/environment.validation';
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AccessTokenGuardGuard } from './auth/guards/access-token/access-token.guard.guard';
 import jwtConfig from './auth/config/jwt.config';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthorizationGuard } from './auth/guards/authorization.guard';
 import { ProfileModule } from './profile/profile.module';
 import { ChatHistoryModule } from './chat-history/chat-history.module';
+import { TransformResponseInterceptor } from './common/interceptors/transform-response.interceptor';
 
 const NODE_ENV = process.env.NODE_ENV ?? 'production';
 
@@ -60,6 +61,10 @@ const NODE_ENV = process.env.NODE_ENV ?? 'production';
       useClass: AuthorizationGuard,
     },
     AccessTokenGuardGuard,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransformResponseInterceptor,
+    },
   ],
 })
 export class AppModule {}

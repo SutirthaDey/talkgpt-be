@@ -28,6 +28,6 @@ import { GoogleAuthenticationProvider } from './provider/google-authentication.p
     GenerateTokenProvider,
     GoogleAuthenticationProvider,
   ],
-  exports: [HashingProvider, JwtModule],
+  exports: [HashingProvider, JwtModule, GenerateTokenProvider],
 })
 export class AuthModule {}

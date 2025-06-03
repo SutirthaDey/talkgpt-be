@@ -39,9 +39,10 @@ export class AuthService {
       );
     }
 
-    const tokens = await this.generateTokenProvider.generateTokens(user);
+    const { accessToken, refreshToken } =
+      await this.generateTokenProvider.generateTokens(user);
 
-    return tokens;
+    return { user, accessToken, refreshToken };
   }
 
   async signUp(signUpDto: SignInDto) {

@@ -14,6 +14,7 @@ import { ConfigType } from '@nestjs/config';
 import { SignUpDto } from 'src/auth/dtos/sign-up.dto';
 import { GoogleUser } from 'src/auth/interface/google-user.interface';
 import { ProfileService } from 'src/profile/profile.service';
+import { GenerateTokenProvider } from 'src/auth/provider/generate-token.provider';
 
 @Injectable()
 export class UsersService {
@@ -25,6 +26,7 @@ export class UsersService {
     @Inject(jwtConfig.KEY)
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
     private readonly profileService: ProfileService,
+    private readonly generateTokenProvider: GenerateTokenProvider,
   ) {}
 
   async getUsers(): Promise<User[]> {
@@ -54,7 +56,10 @@ export class UsersService {
       throw new RequestTimeoutException('Failed to create user');
     }
 
-    return newUser;
+    const { accessToken, refreshToken } =
+      await this.generateTokenProvider.generateTokens(newUser);
+
+    return { user: newUser, accessToken, refreshToken };
   }
 
   async getUserById(id: number) {

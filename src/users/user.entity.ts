@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { ChatHistory } from 'src/chat-history/entities/chat-history.entity';
 import { Profile } from 'src/profile/profile.entity';
 import {
@@ -26,6 +27,7 @@ export class User {
   })
   email: string;
 
+  @Exclude()
   @Column({
     type: 'varchar',
     length: 255,
@@ -33,6 +35,7 @@ export class User {
   })
   password?: string;
 
+  @Exclude()
   @Column({
     type: 'varchar',
     length: 255,
