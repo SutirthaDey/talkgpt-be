@@ -35,7 +35,6 @@ export class ChatHistoryService {
     });
 
     newMessage = await this.messageRepo.save(newMessage);
-    console.log(newMessage);
 
     return newMessage;
   }
