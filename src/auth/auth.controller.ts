@@ -10,6 +10,7 @@ import { SignInDto } from './dtos/sign-in.dto';
 import { Auth } from './decorators/auth-type.decorator';
 import { AuthType } from './enums/auth-types.enum';
 import { GoogleTokenDto } from './dtos/google-token.dto';
+import { GenerateAccessTokenDto } from './dtos/generate-access-token';
 
 @Controller('auth')
 export class AuthController {
@@ -32,5 +33,18 @@ export class AuthController {
   @Post('google-authentication')
   async googleAuthenticate(@Body() googleTokenDto: GoogleTokenDto) {
     return await this.authService.authenticateViaGoogle(googleTokenDto);
+  }
+
+  @Post('verify-access-token')
+  async verifyAccessToken() {
+    return { verified: true };
+  }
+
+  @Auth(AuthType.None)
+  @Post('generate-access-token')
+  async generateAccessToken(
+    @Body() generateAccessTokenDto: GenerateAccessTokenDto,
+  ) {
+    return await this.authService.generateAccessToken(generateAccessTokenDto);
   }
 }
