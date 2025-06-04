@@ -84,7 +84,6 @@ export class AuthService {
       const { sub } = await this.jwtService.verifyAsync<
         Pick<ActiveUserData, 'sub'>
       >(generateAccessTokenDto.refreshToken, this.jwtConfiguration);
-      console.log(sub);
       const user = await this.userService.getUserById(sub);
 
       const { accessToken } =
