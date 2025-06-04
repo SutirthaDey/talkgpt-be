@@ -35,13 +35,13 @@ export class AuthController {
     return await this.authService.authenticateViaGoogle(googleTokenDto);
   }
 
-  @Post('verify-access-token')
+  @Post('verify-access')
   async verifyAccessToken() {
     return { verified: true };
   }
 
   @Auth(AuthType.None)
-  @Post('generate-access-token')
+  @Post('generate-access')
   async generateAccessToken(
     @Body() generateAccessTokenDto: GenerateAccessTokenDto,
   ) {
