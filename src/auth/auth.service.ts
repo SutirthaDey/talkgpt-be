@@ -3,6 +3,7 @@ import {
   forwardRef,
   Inject,
   Injectable,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { SignInDto } from './dtos/sign-in.dto';
@@ -25,24 +26,40 @@ export class AuthService {
     const user = await this.userService.getUserByEmail(signInDto.email);
 
     if (!user) {
-      throw new BadRequestException('Invalid Email provided.');
+      throw new BadRequestException('Invalid email provided.');
     }
 
-    const isValidPassword = await this.hashingProvider.compare(
-      signInDto.password,
-      user.password,
-    );
-
-    if (!isValidPassword) {
+    if (user.googleId) {
       throw new BadRequestException(
-        'Invalid Password Provided. Please check again.',
+        'This email is registered with a Google account. Please use Google sign-in.',
       );
     }
 
-    const { accessToken, refreshToken } =
-      await this.generateTokenProvider.generateTokens(user);
+    let isValidPassword: boolean;
+    try {
+      isValidPassword = await this.hashingProvider.compare(
+        signInDto.password,
+        user.password,
+      );
+    } catch {
+      throw new BadRequestException(
+        'An error occurred during password validation.',
+      );
+    }
 
-    return { user, accessToken, refreshToken };
+    if (!isValidPassword) {
+      throw new BadRequestException('Invalid passoword provided.');
+    }
+
+    try {
+      const { accessToken, refreshToken } =
+        await this.generateTokenProvider.generateTokens(user);
+      return { user, accessToken, refreshToken };
+    } catch {
+      throw new InternalServerErrorException(
+        'Failed to generate authentication tokens.',
+      );
+    }
   }
 
   async signUp(signUpDto: SignInDto) {

@@ -2,6 +2,7 @@ import {
   ConflictException,
   Inject,
   Injectable,
+  InternalServerErrorException,
   RequestTimeoutException,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
@@ -37,12 +38,12 @@ export class UsersService {
     const { email, password } = signUpDto;
 
     const user = await this.getUserByEmail(email);
-    let newUser;
 
     if (user) {
       throw new ConflictException('Email already exists.');
     }
 
+    let newUser: User;
     try {
       const profile = await this.profileService.createProfile({});
       newUser = this.userRepository.create({
@@ -56,10 +57,16 @@ export class UsersService {
       throw new RequestTimeoutException('Failed to create user');
     }
 
-    const { accessToken, refreshToken } =
-      await this.generateTokenProvider.generateTokens(newUser);
+    try {
+      const { accessToken, refreshToken } =
+        await this.generateTokenProvider.generateTokens(newUser);
 
-    return { user: newUser, accessToken, refreshToken };
+      return { user: newUser, accessToken, refreshToken };
+    } catch {
+      throw new InternalServerErrorException(
+        'Failed to generate authentication tokens.',
+      );
+    }
   }
 
   async getUserById(id: number) {
