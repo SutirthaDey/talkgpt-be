@@ -1,5 +1,6 @@
 import { User } from 'src/users/user.entity';
 import {
+  Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
@@ -22,12 +23,12 @@ export class ChatHistory {
   })
   messages: ChatMessage[];
 
-  // @Column({
-  //   type: 'boolean',
-  //   default: false,
-  //   nullable: false,
-  // })
-  // isCompleted: boolean;
+  @Column({
+    type: 'text',
+    default: 'New Chat',
+    nullable: false,
+  })
+  title: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
