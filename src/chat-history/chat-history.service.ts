@@ -45,10 +45,14 @@ export class ChatHistoryService {
     sessionId: string,
     user: ActiveUserData,
   ): Promise<ChatMessage[]> {
-    return this.messageRepo.find({
-      where: { chatHistory: { id: sessionId, user: user } },
-      order: { createdAt: 'ASC' },
-    });
+    try {
+      return this.messageRepo.find({
+        where: { chatHistory: { id: sessionId, user: { id: user.sub } } },
+        order: { createdAt: 'ASC' },
+      });
+    } catch {
+      throw new InternalServerErrorException('Error fetching session messages');
+    }
   }
 
   async getUserSessions(user: ActiveUserData): Promise<ChatHistory[]> {
@@ -58,7 +62,7 @@ export class ChatHistoryService {
         order: { createdAt: 'DESC' },
       });
     } catch {
-      throw new InternalServerErrorException('Error fetching user session');
+      throw new InternalServerErrorException('Error fetching user sessions');
     }
   }
 
