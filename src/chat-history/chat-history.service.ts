@@ -17,13 +17,14 @@ export class ChatHistoryService {
   ) {}
 
   async createSession(user: ActiveUserData): Promise<ChatHistory> {
-    const session = this.historyRepo.create({ user });
+    const session = this.historyRepo.create({ user: { id: user.sub } });
     return await this.historyRepo.save(session);
   }
 
   async addMessage(
     sessionId: string,
     sendMessageDto: SendMessageDto,
+    role: string,
   ): Promise<ChatMessage> {
     const chatHistory = await this.historyRepo.findOne({
       where: { id: sessionId },
@@ -32,6 +33,7 @@ export class ChatHistoryService {
     let newMessage = this.messageRepo.create({
       ...sendMessageDto,
       chatHistory,
+      role,
     });
 
     newMessage = await this.messageRepo.save(newMessage);
@@ -39,9 +41,12 @@ export class ChatHistoryService {
     return newMessage;
   }
 
-  async getHistory(sessionId: string): Promise<ChatMessage[]> {
+  async getHistory(
+    sessionId: string,
+    user: ActiveUserData,
+  ): Promise<ChatMessage[]> {
     return this.messageRepo.find({
-      where: { chatHistory: { id: sessionId } },
+      where: { chatHistory: { id: sessionId, user: user } },
       order: { createdAt: 'ASC' },
     });
   }
@@ -51,6 +56,16 @@ export class ChatHistoryService {
       where: { user },
       order: { createdAt: 'DESC' },
       relations: ['messages'],
+    });
+  }
+
+  async findSessionByUser(
+    user: ActiveUserData,
+    sessionId: string,
+  ): Promise<ChatHistory> {
+    return this.historyRepo.findOneBy({
+      user: { id: user.sub },
+      id: sessionId,
     });
   }
 }

@@ -12,30 +12,28 @@ export class ChatHistoryController {
     private readonly chatProvider: ChatProvider,
   ) {}
 
-  /* creates a sessionId in database and starts a conversation **/
-  @Post('start')
-  createSession(@ActiveUser('sub') user: ActiveUserData) {
-    return this.chatHistoryService.createSession(user);
-  }
-
   /** Takes user message
    * - inserts the message in db
    * - prepare ai response based on user message
    * - triggers sse response to user
    * - saves the response of system in db
    */
-  @Post('message/:sessionId')
+  @Post(':sessionId?')
   sendMessage(
-    @Param('sessionId') sessionId: string,
     @Body() sendMessageDto: SendMessageDto,
+    @ActiveUser() user: ActiveUserData,
+    @Param('sessionId') sessionId?: string,
   ) {
-    return this.chatProvider.handleUserMessage(sessionId, sendMessageDto);
+    return this.chatProvider.handleUserMessage(sendMessageDto, user, sessionId);
   }
 
   /* Fetches messages of a particular session **/
-  @Get(':sessionId')
-  getSessionMessages(@Param('sessionId') sessionId: string) {
-    return this.chatHistoryService.getHistory(sessionId);
+  @Get('/:sessionId')
+  async getSessionMessages(
+    @Param('sessionId') sessionId: string,
+    @ActiveUser() user: ActiveUserData,
+  ) {
+    return await this.chatHistoryService.getHistory(sessionId, user);
   }
 
   /* Fetches session by a particular userId **/

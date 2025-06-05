@@ -1,8 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { ChatHistoryService } from '../chat-history.service';
 import { StreamingService } from 'src/streaming/streaming.service';
 import { SendMessageDto } from '../dtos/send-message.dto';
 import { SenderRoleEnum } from '../enums/sender-role.enum';
+import { ActiveUserData } from 'src/auth/interface/active-user.interface';
 
 @Injectable()
 export class ChatProvider {
@@ -11,22 +16,66 @@ export class ChatProvider {
     private readonly streamingService: StreamingService,
   ) {}
 
-  async handleUserMessage(sessionId: string, sendMessageDto: SendMessageDto) {
-    // 1. Save user message
-    await this.chatHistoryService.addMessage(sessionId, sendMessageDto);
+  async handleUserMessage(
+    sendMessageDto: SendMessageDto,
+    user: ActiveUserData,
+    sessionId?: string,
+  ) {
+    // create a session if session Id is null
+    if (!sessionId) {
+      try {
+        const newSession = await this.chatHistoryService.createSession(user);
+        sessionId = newSession.id;
+      } catch {
+        throw new BadRequestException('Failed to create session.');
+      }
+    } else {
+      const session = await this.chatHistoryService.findSessionByUser(
+        user,
+        sessionId,
+      );
+
+      if (!session) {
+        throw new BadRequestException(
+          `Yor are not authorized to access this session`,
+        );
+      }
+    }
+
+    let role = SenderRoleEnum.User;
+
+    try {
+      // 1. Save user message
+      await this.chatHistoryService.addMessage(sessionId, sendMessageDto, role);
+    } catch {
+      throw new BadRequestException('Failed to save user message.');
+    }
 
     // 2. Simulate assistant thinking and sending tokens (stream)
     const fakeResponse = `Reponse: ${sendMessageDto.message}`;
     const words = fakeResponse.split(' ');
 
-    for (const word of words) {
-      await new Promise((res) => setTimeout(res, 20)); // simulate delay
-      this.streamingService.emitToSession(sessionId, word + ' ');
+    try {
+      for (const word of words) {
+        await new Promise((res) => setTimeout(res, 20)); // simulate delay
+        this.streamingService.emitToSession(sessionId, word + ' ');
+      }
+    } catch {
+      throw new InternalServerErrorException(
+        'Failed to simulate assistant thinking.',
+      );
     }
 
-    sendMessageDto.role = SenderRoleEnum.System;
+    role = SenderRoleEnum.System;
     sendMessageDto.message = fakeResponse;
+
     // 3. Save assistant full response as a message
-    await this.chatHistoryService.addMessage(sessionId, sendMessageDto);
+    try {
+      await this.chatHistoryService.addMessage(sessionId, sendMessageDto, role);
+    } catch {
+      throw new BadRequestException('Failed to save user message.');
+    }
+
+    return {};
   }
 }
