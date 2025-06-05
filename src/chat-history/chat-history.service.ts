@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ChatHistory } from './entities/chat-history.entity';
 import { ChatMessage } from './entities/chat-message.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -52,11 +52,14 @@ export class ChatHistoryService {
   }
 
   async getUserSessions(user: ActiveUserData): Promise<ChatHistory[]> {
-    return this.historyRepo.find({
-      where: { user },
-      order: { createdAt: 'DESC' },
-      relations: ['messages'],
-    });
+    try {
+      return this.historyRepo.find({
+        where: { user: { id: user.sub } },
+        order: { createdAt: 'DESC' },
+      });
+    } catch {
+      throw new InternalServerErrorException('Error fetching user session');
+    }
   }
 
   async findSessionByUser(

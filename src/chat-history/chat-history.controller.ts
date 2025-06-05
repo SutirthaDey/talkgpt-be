@@ -18,6 +18,13 @@ export class ChatHistoryController {
    * - triggers sse response to user
    * - saves the response of system in db
    */
+
+  /* Fetches session by a particular userId **/
+  @Get('sessions')
+  getAllSessions(@ActiveUser() user: ActiveUserData) {
+    return this.chatHistoryService.getUserSessions(user);
+  }
+
   @Post(':sessionId?')
   sendMessage(
     @Body() sendMessageDto: SendMessageDto,
@@ -28,17 +35,11 @@ export class ChatHistoryController {
   }
 
   /* Fetches messages of a particular session **/
-  @Get('/:sessionId')
+  @Get(':sessionId')
   async getSessionMessages(
     @Param('sessionId') sessionId: string,
     @ActiveUser() user: ActiveUserData,
   ) {
     return await this.chatHistoryService.getHistory(sessionId, user);
-  }
-
-  /* Fetches session by a particular userId **/
-  @Get('sessions/:userId')
-  getAllSessions(@ActiveUser('sub') user: ActiveUserData) {
-    return this.chatHistoryService.getUserSessions(user);
   }
 }
