@@ -63,7 +63,10 @@ export class ChatProvider {
       //   await new Promise((res) => setTimeout(res, 20)); // simulate delay
       //   this.streamingService.emitToSession(sessionId, word + ' ');
       // }
-      reply = await this.groqProvider.streamGroqResponse(sessionId);
+      reply = await this.groqProvider.streamGroqResponse(
+        sessionId,
+        sendMessageDto.chatHistory,
+      );
     } catch {
       throw new InternalServerErrorException(
         'Failed to simulate assistant thinking.',

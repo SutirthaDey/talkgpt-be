@@ -3,6 +3,7 @@ import Groq from 'groq-sdk';
 import { StreamingService } from '../streaming.service';
 import streamingConfig from '../config/streaming.config';
 import { ConfigType } from '@nestjs/config';
+import ChatHistoryDtoInterface from 'src/chat-history/interfaces/chat-history-dto.interface';
 
 @Injectable()
 export class GroqProvider implements OnModuleInit {
@@ -18,8 +19,11 @@ export class GroqProvider implements OnModuleInit {
     this.groq = new Groq({ apiKey: this.streamingConfiguration.groqKey });
   }
 
-  public async streamGroqResponse(sessionId: string) {
-    const stream = await this.getGroqChatStream();
+  public async streamGroqResponse(
+    sessionId: string,
+    chatHistory: ChatHistoryDtoInterface[],
+  ) {
+    const stream = await this.getGroqChatStream(chatHistory);
     let reply: string = '';
 
     for await (const chunk of stream) {
@@ -35,7 +39,7 @@ export class GroqProvider implements OnModuleInit {
     return reply;
   }
 
-  private async getGroqChatStream() {
+  private async getGroqChatStream(chatHistory: ChatHistoryDtoInterface[]) {
     return this.groq.chat.completions.create({
       messages: [
         {
@@ -43,10 +47,7 @@ export class GroqProvider implements OnModuleInit {
           content: 'You are a helpful assistant.',
         },
         // Set a user message for the assistant to respond to.
-        {
-          role: 'user',
-          content: 'Explain the importance of fast language models',
-        },
+        ...chatHistory,
       ],
 
       // The language model which will generate the completion.
