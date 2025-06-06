@@ -21,12 +21,16 @@ export class GroqProvider implements OnModuleInit {
   public async streamGroqResponse(sessionId: string) {
     const stream = await this.getGroqChatStream();
     let reply: string = '';
+
     for await (const chunk of stream) {
       const content = chunk.choices[0]?.delta?.content || '';
       this.streamingService.emitToSession(sessionId, content);
 
       reply = reply + content;
     }
+
+    // Emit a custom end-of-stream indicator
+    this.streamingService.emitToSession(sessionId, '[STREAM_END]');
 
     return reply;
   }
@@ -59,7 +63,7 @@ export class GroqProvider implements OnModuleInit {
 
       // The maximum number of tokens to generate. Requests can use up to
       // 2048 tokens shared between prompt and completion.
-      max_completion_tokens: 100,
+      max_completion_tokens: 50,
 
       // Controls diversity via nucleus sampling: 0.5 means half of all
       // likelihood-weighted options are considered.

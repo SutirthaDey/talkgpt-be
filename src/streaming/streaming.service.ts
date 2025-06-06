@@ -3,12 +3,12 @@ import { Observable, Subject } from 'rxjs';
 
 @Injectable()
 export class StreamingService {
-  private sessions = new Map<string, Subject<MessageEvent>>();
+  private sessions = new Map<string, Subject<{ data: string }>>();
 
   // Create or get subject for session
-  getOrCreateSubject(sessionId: string): Subject<MessageEvent> {
+  getOrCreateSubject(sessionId: string): Subject<{ data: string }> {
     if (!this.sessions.has(sessionId)) {
-      this.sessions.set(sessionId, new Subject<MessageEvent>());
+      this.sessions.set(sessionId, new Subject<{ data: string }>());
     }
     return this.sessions.get(sessionId);
   }
@@ -31,7 +31,7 @@ export class StreamingService {
   emitToSession(sessionId: string, data: string) {
     const subject = this.sessions.get(sessionId);
     if (subject) {
-      subject.next(new MessageEvent('message', { data }));
+      subject.next({ data }); // Plain object
     }
   }
 }
