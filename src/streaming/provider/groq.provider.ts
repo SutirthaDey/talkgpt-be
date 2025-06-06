@@ -64,7 +64,7 @@ export class GroqProvider implements OnModuleInit {
 
       // The maximum number of tokens to generate. Requests can use up to
       // 2048 tokens shared between prompt and completion.
-      max_completion_tokens: 50,
+      max_completion_tokens: 512,
 
       // Controls diversity via nucleus sampling: 0.5 means half of all
       // likelihood-weighted options are considered.
