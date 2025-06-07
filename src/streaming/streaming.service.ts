@@ -4,6 +4,7 @@ import { Observable, Subject } from 'rxjs';
 @Injectable()
 export class StreamingService {
   private sessions = new Map<string, Subject<{ data: string }>>();
+  private userStreams: Map<number, Subject<any>> = new Map();
 
   // Create or get subject for session
   getOrCreateSubject(sessionId: string): Subject<{ data: string }> {
@@ -25,6 +26,21 @@ export class StreamingService {
         this.sessions.delete(sessionId); // 🧹 prevent memory leaks
       };
     });
+  }
+
+  getSessionStreamForUser(userId: number) {
+    if (!this.userStreams.has(userId)) {
+      this.userStreams.set(userId, new Subject());
+    }
+
+    return this.userStreams.get(userId).asObservable();
+  }
+
+  sendSessionToUser(userId: number, sessionId: string) {
+    const stream = this.userStreams.get(userId);
+    if (stream) {
+      stream.next({ data: sessionId });
+    }
   }
 
   // Emit a message to a session

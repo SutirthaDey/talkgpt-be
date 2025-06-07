@@ -1,4 +1,4 @@
-import { Controller, Param, Sse } from '@nestjs/common';
+import { Controller, Param, ParseIntPipe, Sse } from '@nestjs/common';
 import { StreamingService } from './streaming.service';
 import { Observable } from 'rxjs';
 import { AuthType } from 'src/auth/enums/auth-types.enum';
@@ -12,5 +12,12 @@ export class StreamingController {
   @Sse('stream/:sessionId')
   stream(@Param('sessionId') sessionId: string): Observable<MessageEvent> {
     return this.streamingService.getMessageStream(sessionId);
+  }
+
+  @Sse('sessions/:userId')
+  streamToUser(
+    @Param('userId', ParseIntPipe) userId: number,
+  ): Observable<MessageEvent> {
+    return this.streamingService.getSessionStreamForUser(userId);
   }
 }

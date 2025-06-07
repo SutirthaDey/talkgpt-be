@@ -9,6 +9,7 @@ import { SendMessageDto } from '../dtos/send-message.dto';
 import { SenderRoleEnum } from '../enums/sender-role.enum';
 import { ActiveUserData } from 'src/auth/interface/active-user.interface';
 import { GroqProvider } from 'src/streaming/provider/groq.provider';
+import { ChatHistory } from '../entities/chat-history.entity';
 
 @Injectable()
 export class ChatProvider {
@@ -23,6 +24,8 @@ export class ChatProvider {
     user: ActiveUserData,
     sessionId?: string,
   ) {
+    let session: ChatHistory;
+
     // create a session if session Id is null
     if (!sessionId) {
       const title = await this.groqProvider.getMessageSummary(
@@ -34,7 +37,10 @@ export class ChatProvider {
           user,
           title,
         );
-        sessionId = newSession.id;
+        session = newSession;
+        sessionId = session.id;
+
+        this.streamingService.sendSessionToUser(user.sub, sessionId);
       } catch {
         throw new BadRequestException('Failed to create session.');
       }
@@ -82,6 +88,6 @@ export class ChatProvider {
       throw new BadRequestException('Failed to save user message.');
     }
 
-    return { sessionId: sessionId };
+    return { session };
   }
 }
