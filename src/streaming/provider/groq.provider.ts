@@ -31,6 +31,8 @@ export class GroqProvider implements OnModuleInit {
       this.streamingService.emitToSession(sessionId, content);
 
       reply = reply + content;
+
+      await new Promise((resolve) => setTimeout(resolve, 40));
     }
 
     // Emit a custom end-of-stream indicator
