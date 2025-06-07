@@ -32,7 +32,7 @@ export class GroqProvider implements OnModuleInit {
 
       reply = reply + content;
 
-      await new Promise((resolve) => setTimeout(resolve, 40));
+      await new Promise((resolve) => setTimeout(resolve, 60));
     }
 
     // Emit a custom end-of-stream indicator

@@ -24,6 +24,7 @@ export class ChatProvider {
     sessionId?: string,
   ) {
     // create a session if session Id is null
+    console.log(sessionId);
     if (!sessionId) {
       try {
         const newSession = await this.chatHistoryService.createSession(user);
@@ -83,6 +84,6 @@ export class ChatProvider {
       throw new BadRequestException('Failed to save user message.');
     }
 
-    return {};
+    return { sessionId: sessionId };
   }
 }
