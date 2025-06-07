@@ -31,7 +31,6 @@ export class ChatHistoryController {
     @ActiveUser() user: ActiveUserData,
     @Param('sessionId') sessionId?: string,
   ) {
-    console.log(sessionId);
     return this.chatProvider.handleUserMessage(sendMessageDto, user, sessionId);
   }
 

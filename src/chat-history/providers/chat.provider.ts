@@ -24,7 +24,6 @@ export class ChatProvider {
     sessionId?: string,
   ) {
     // create a session if session Id is null
-    console.log(sessionId);
     if (!sessionId) {
       try {
         const newSession = await this.chatHistoryService.createSession(user);
