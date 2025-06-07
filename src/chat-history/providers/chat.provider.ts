@@ -25,8 +25,15 @@ export class ChatProvider {
   ) {
     // create a session if session Id is null
     if (!sessionId) {
+      const title = await this.groqProvider.getMessageSummary(
+        sendMessageDto.message,
+      );
+
       try {
-        const newSession = await this.chatHistoryService.createSession(user);
+        const newSession = await this.chatHistoryService.createSession(
+          user,
+          title,
+        );
         sessionId = newSession.id;
       } catch {
         throw new BadRequestException('Failed to create session.');
@@ -53,16 +60,8 @@ export class ChatProvider {
       throw new BadRequestException('Failed to save user message.');
     }
 
-    // 2. Simulate assistant thinking and sending tokens (stream)
-    // const fakeResponse = `Reponse: ${sendMessageDto.message}`;
-    // const words = fakeResponse.split(' ');
-
     let reply;
     try {
-      // for (const word of words) {
-      //   await new Promise((res) => setTimeout(res, 20)); // simulate delay
-      //   this.streamingService.emitToSession(sessionId, word + ' ');
-      // }
       reply = await this.groqProvider.streamGroqResponse(
         sessionId,
         sendMessageDto.chatHistory,

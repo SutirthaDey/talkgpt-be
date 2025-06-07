@@ -16,8 +16,11 @@ export class ChatHistoryService {
     private messageRepo: Repository<ChatMessage>,
   ) {}
 
-  async createSession(user: ActiveUserData): Promise<ChatHistory> {
-    const session = this.historyRepo.create({ user: { id: user.sub } });
+  async createSession(
+    user: ActiveUserData,
+    title: string,
+  ): Promise<ChatHistory> {
+    const session = this.historyRepo.create({ user: { id: user.sub }, title });
     return await this.historyRepo.save(session);
   }
 

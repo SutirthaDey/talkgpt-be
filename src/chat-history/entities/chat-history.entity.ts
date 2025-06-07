@@ -28,7 +28,7 @@ export class ChatHistory {
     default: 'New Chat',
     nullable: false,
   })
-  title: boolean;
+  title: string;
 
   @CreateDateColumn()
   createdAt: Date;

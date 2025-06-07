@@ -4,6 +4,7 @@ import { StreamingService } from '../streaming.service';
 import streamingConfig from '../config/streaming.config';
 import { ConfigType } from '@nestjs/config';
 import ChatHistoryDtoInterface from 'src/chat-history/interfaces/chat-history-dto.interface';
+import { SenderRoleEnum } from 'src/chat-history/enums/sender-role.enum';
 
 @Injectable()
 export class GroqProvider implements OnModuleInit {
@@ -46,40 +47,37 @@ export class GroqProvider implements OnModuleInit {
       messages: [
         {
           role: 'system',
-          content: 'You are a helpful assistant.',
+          content:
+            'You are Nova, a smart, friendly AI assistant. Help users clearly and concisely like ChatGPT.',
         },
-        // Set a user message for the assistant to respond to.
         ...chatHistory,
       ],
-
-      // The language model which will generate the completion.
       model: 'llama-3.3-70b-versatile',
-
-      //
-      // Optional parameters
-      //
-
-      // Controls randomness: lowering results in less random completions.
-      // As the temperature approaches zero, the model will become deterministic
-      // and repetitive.
       temperature: 0.5,
-
-      // The maximum number of tokens to generate. Requests can use up to
-      // 2048 tokens shared between prompt and completion.
       max_completion_tokens: 512,
-
-      // Controls diversity via nucleus sampling: 0.5 means half of all
-      // likelihood-weighted options are considered.
       top_p: 1,
-
-      // A stop sequence is a predefined or user-specified text string that
-      // signals an AI to stop generating content, ensuring its responses
-      // remain focused and concise. Examples include punctuation marks and
-      // markers like "[end]".
       stop: null,
 
-      // If set, partial message deltas will be sent.
       stream: true,
     });
+  }
+
+  public async getMessageSummary(message: string) {
+    const chatHistory = [
+      {
+        role: SenderRoleEnum.User,
+        content: `Summarize following text within 3-4 words strictly, just key words, I want to make a title out of it. The sentence is : ${message}`,
+      },
+    ];
+
+    const stream = await this.getGroqChatStream(chatHistory);
+    let reply: string = '';
+
+    for await (const chunk of stream) {
+      const content = chunk.choices[0]?.delta?.content || '';
+      reply = reply + content;
+    }
+
+    return reply;
   }
 }
