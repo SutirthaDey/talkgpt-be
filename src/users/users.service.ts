@@ -84,7 +84,8 @@ export class UsersService {
       const user = await this.userRepository.findOneBy({ email });
 
       return user;
-    } catch {
+    } catch (error) {
+      console.error('Database error:', error);
       throw new RequestTimeoutException('Could not execute the query.');
     }
   }
