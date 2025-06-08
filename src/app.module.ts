@@ -47,6 +47,9 @@ const NODE_ENV = process.env.NODE_ENV ?? 'production';
           synchronize: configService.get('database.synchronize') === 'true',
           autoLoadEntities:
             configService.get('database.autoLoadEntities') === 'true',
+          ssl: {
+            rejectUnauthorized: false, // Needed for Supabase and other managed DBs
+          },
         };
       },
     }),

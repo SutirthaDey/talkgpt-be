@@ -41,20 +41,19 @@ export class GoogleAuthenticationProvider implements OnModuleInit {
       picture: profilePic,
     } = loginTicket.getPayload();
 
-    const user = await this.userService.getUserByGoogleId(googleId);
+    let user = await this.userService.getUserByGoogleId(googleId);
 
     if (!user) {
-      const newUser = await this.userService.createGoogleUser({
+      user = await this.userService.createGoogleUser({
         email,
         googleId,
         firstName,
         lastName,
         profilePic,
       });
-
-      return await this.generateTokenProvider.generateTokens(newUser);
     }
 
-    return await this.generateTokenProvider.generateTokens(user);
+    const tokens = await this.generateTokenProvider.generateTokens(user);
+    return { tokens, user };
   }
 }
