@@ -41,7 +41,7 @@ export class ChatProvider {
         sessionId = session.id;
 
         this.streamingService.sendSessionToUser(user.sub, sessionId);
-        await new Promise((r) => setTimeout(r, 5000));
+        // await new Promise((r) => setTimeout(r, 5000));
       } catch {
         throw new BadRequestException('Failed to create session.');
       }
