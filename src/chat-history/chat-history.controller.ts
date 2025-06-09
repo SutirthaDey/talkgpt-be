@@ -26,7 +26,7 @@ export class ChatHistoryController {
     return this.chatHistoryService.getUserSessions(user);
   }
 
-  @Throttle({ default: { limit: 5, ttl: 600000, blockDuration: 300000 } })
+  @Throttle({ default: { limit: 15, ttl: 600000, blockDuration: 300000 } })
   @Post(':sessionId?')
   sendMessage(
     @Body() sendMessageDto: SendMessageDto,

@@ -1,11 +1,13 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { IsArray, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 import ChatHistoryDtoInterface from '../interfaces/chat-history-dto.interface';
 import { ChatHistoryBodyDto } from './chat-history-body.dto';
+import xss from 'xss';
 
 export class SendMessageDto {
   @IsNotEmpty()
   @IsString()
+  @Transform(({ value }) => xss(value))
   message: string;
 
   @IsArray()
