@@ -2,12 +2,12 @@ import { Transform, Type } from 'class-transformer';
 import { IsArray, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 import ChatHistoryDtoInterface from '../interfaces/chat-history-dto.interface';
 import { ChatHistoryBodyDto } from './chat-history-body.dto';
-import xss from 'xss';
+import { strictSanitize } from 'src/auth/utils/sanitize-input.util';
 
 export class SendMessageDto {
   @IsNotEmpty()
   @IsString()
-  @Transform(({ value }) => xss(value))
+  @Transform(({ value }) => strictSanitize(value))
   message: string;
 
   @IsArray()
