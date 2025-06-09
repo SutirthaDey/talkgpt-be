@@ -4,6 +4,7 @@ import { ActiveUser } from 'src/auth/decorators/active-user.decorator';
 import { ActiveUserData } from 'src/auth/interface/active-user.interface';
 import { SendMessageDto } from './dtos/send-message.dto';
 import { ChatProvider } from './providers/chat.provider';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('chat')
 export class ChatHistoryController {
@@ -25,6 +26,7 @@ export class ChatHistoryController {
     return this.chatHistoryService.getUserSessions(user);
   }
 
+  @Throttle({ default: { limit: 5, ttl: 600000, blockDuration: 300000 } })
   @Post(':sessionId?')
   sendMessage(
     @Body() sendMessageDto: SendMessageDto,

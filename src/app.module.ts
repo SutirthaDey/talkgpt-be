@@ -16,6 +16,7 @@ import { AuthorizationGuard } from './auth/guards/authorization.guard';
 import { ProfileModule } from './profile/profile.module';
 import { ChatHistoryModule } from './chat-history/chat-history.module';
 import { TransformResponseInterceptor } from './common/interceptors/transform-response.interceptor';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 const NODE_ENV = process.env.NODE_ENV ?? 'production';
 
@@ -53,6 +54,15 @@ const NODE_ENV = process.env.NODE_ENV ?? 'production';
         };
       },
     }),
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          limit: 30,
+          ttl: 60,
+          blockDuration: 300,
+        },
+      ],
+    }),
     ProfileModule,
     ChatHistoryModule,
   ],
@@ -67,6 +77,10 @@ const NODE_ENV = process.env.NODE_ENV ?? 'production';
     {
       provide: APP_INTERCEPTOR,
       useClass: TransformResponseInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
 })
